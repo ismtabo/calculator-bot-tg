@@ -27,6 +27,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ismtabo/calculator_bot:${{ steps.docker_build.get_version.version }}-${{ steps.docker_build.get_version.hash }}
+          tags: ismtabo/calculator_bot:${{ steps.get_version.outputs.version }}-${{ steps.get_version.outputs.hash }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
