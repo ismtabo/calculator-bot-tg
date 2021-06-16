@@ -1,6 +1,9 @@
 """Module of definition controller."""
 
 import logging
+from collections import defaultdict
+from threading import Lock
+from typing import DefaultDict
 from uuid import uuid4
 
 from telegram import (InlineKeyboardMarkup, InlineQueryResultArticle,
@@ -20,6 +23,7 @@ class TelegramCalculatorController:
     def __init__(self, token: str, service: CalculatorService) -> None:
         self.token = token
         self.service = service
+        self.locks: DefaultDict[str, Lock] = defaultdict(Lock)
 
     def start(self, update: Update, context: CallbackContext) -> None:
         """Send a message when the command /start is issued."""
@@ -60,9 +64,10 @@ class TelegramCalculatorController:
     def callbackquery(self, update: Update, context: CallbackContext) -> None:
         """Handle the callback queries."""
         if update.callback_query:
-            message_id = update.callback_query.message.message_id \
+            message_id: str = str(update.callback_query.message.message_id \
                 if update.callback_query.message \
-                else update.callback_query.inline_message_id
+                else update.callback_query.inline_message_id)
+            locked = self.locks[message_id].locked()
             expr = update.callback_query.data
             if not expr:
                 logging.debug(
@@ -83,7 +88,8 @@ class TelegramCalculatorController:
                     'failed evaluating calculator expression: %s', result.unwrap_err())
                 return
             calc = result.unwrap()
-            text = '%g\n%s' % (calc.value, calc.expr)
+            text = ('%g' % calc.value).ljust(50)
+            text += ('\n> %s' % calc.expr)
             if update.callback_query.message:
                 if text != update.callback_query.message.text:
                     message = update.callback_query.message.edit_text(
@@ -102,6 +108,8 @@ class TelegramCalculatorController:
                 if not isinstance(message, Message):
                     logging.error(
                         'failed editing callback message: %s', message)
+            if locked:
+                self.locks[message_id].release()
 
     def create_inline_markup_keyboard(self) -> InlineKeyboardMarkup:
         """Creates inline keyboard markup for calculators."""
