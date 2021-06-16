@@ -7,12 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Get the version
-        id: get_version
-        shell: bash
-        run: |
-          echo ::set-output name=version::${GITHUB_REF#refs/heads/}
-          echo ::set-output name=sha_short::git_hash=$(git rev-parse --short "$GITHUB_SHA")
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1.0.0
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -27,6 +24,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ismtabo/calculator_bot:${{ steps.get_version.outputs.version }}-${{ steps.get_version.outputs.hash }}
+          tags: ismtabo/calculator_bot:${{steps.tag.outputs.tag}}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
