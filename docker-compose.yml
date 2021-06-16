@@ -1,0 +1,8 @@
+version: "2.4"
+
+services:
+  tgbot:
+    build:
+      context: .
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}

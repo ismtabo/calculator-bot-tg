@@ -1,0 +1,32 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+beautifulsoup4 = "*"
+"web.py" = "*"
+requests = "*"
+python-telegram-bot = "*"
+html5lib = "*"
+pylama = "*"
+pylint = "*"
+mypy = "*"
+coverage = "*"
+option = "*"
+py-expression-eval = "*"
+
+[dev-packages]
+types-requests = "*"
+autopep8 = "*"
+
+[requires]
+python_version = "3.8"
+
+[scripts]
+lint = "pylama"
+test = "python -m unittest discover"
+test-cov = "coverage run -m unittest discover"
+report = "coverage"
+report-html = "coverage html"
+report-xml = "coverage xml"
