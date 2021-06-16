@@ -11,8 +11,8 @@ jobs:
         id: get_version
         shell: bash
         run: |
-          echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-          echo ::set-output name=sha_short::$(git rev-parse --short HEAD)
+          echo ::set-output name=version::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=sha_short::git_hash=$(git rev-parse --short "$GITHUB_SHA")
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
